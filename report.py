@@ -1,3 +1,10 @@
+"""
+Есть API для получения списка задач и api для получения списка юзеров:
+https://json.medrating.org/todos
+https://json.medrating.org/users
+Используя только эти API составить отчёты по всем юзерам в отдельных текстовых файлах.
+"""
+
 import os
 import json
 import urllib.request
@@ -13,18 +20,19 @@ with urllib.request.urlopen("https://json.medrating.org/todos") as url:
     TODOS = json.loads(url.read().decode())
 
 
-def todo_list():
+def todo_list(id_user):
+    """Формирует строку выполненных и невыполненых заданий пользователя"""
     completed = ''
     not_completed = ''
 
     for todo in TODOS:
-        if user['id'] == todo.get('userId'):
+        if id_user == todo.get('userId'):
             if todo['completed']:
                 if len(todo['title']) <= 50:
                     completed += f"{todo['title']}\n"
                 else:
                     completed += f"{todo['title'][:50]}...\n"
-            elif not todo['completed']:
+            else:
                 if len(todo['title']) <= 50:
                     not_completed += f"{todo['title']}\n"
                 else:
@@ -33,7 +41,8 @@ def todo_list():
 
 
 for user in USERS:
-    todo_list()
+    COMPLETED, NOT_COMPLETED = todo_list(user.get('id'))
+
     if 'username' in user:
         with open(f'tasks/{user["username"]}.txt', 'w', encoding='utf-8') as file:
             file.write(
@@ -42,8 +51,8 @@ for user in USERS:
 {user["company"]["name"]}
 
 Завершенные задачи:
-{todo_list()[0]}
+{COMPLETED}
 
 Оставшиеся задачи:
-{todo_list()[1]}
-""")
+{NOT_COMPLETED}
+                """)
