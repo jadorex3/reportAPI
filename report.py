@@ -25,7 +25,7 @@ except ValueError:
 
 
 def three_dots(string, length=50):
-    """Срезает строку до ln и ставит '...' """
+    """Срезает строку до length и ставит '...' """
     string = f"{string[:length]}...\n" if string[length:] else f"{string}\n"
     return string
 
