@@ -8,6 +8,7 @@ https://json.medrating.org/users
 import os
 import json
 import urllib.request
+from urllib.error import URLError, HTTPError
 from datetime import datetime
 
 if not os.path.exists('tasks'):
@@ -20,6 +21,12 @@ try:
     with urllib.request.urlopen("https://json.medrating.org/todos") as url:
         TODOS = json.loads(url.read().decode())
 
+except HTTPError as err:
+    print('The server couldn\'t fulfill the request.')
+    print('Error code: ', err.code)
+except URLError as err:
+    print('We failed to reach a server.')
+    print('Reason: ', err.reason)
 except ValueError:
     print("Ошибка при загрузке файла JSON")
 
