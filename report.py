@@ -25,13 +25,18 @@ except ValueError:
 
 
 def three_dots(string, length=50):
-    """Срезает строку до length и ставит '...' """
+    """Срезает строку до length и ставит '...'
+    string - принимаемая строка
+    length - граница среза строки (по умолчанию - 50)
+    """
     string = f"{string[:length]}...\n" if string[length:] else f"{string}\n"
     return string
 
 
 def todo_list(id_user):
-    """Формирует строку выполненных и невыполненых заданий id_user пользователя"""
+    """Формирует строку выполненных и невыполненых заданий id_user пользователя
+    id_user - номер пользователя
+    """
     completed = ''
     not_completed = ''
 
