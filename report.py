@@ -13,11 +13,15 @@ from datetime import datetime
 if not os.path.exists('tasks'):
     os.mkdir('tasks')
 
-with urllib.request.urlopen("https://json.medrating.org/users") as url:
-    USERS = json.loads(url.read().decode())
+try:
+    with urllib.request.urlopen("https://json.medrating.org/users") as url:
+        USERS = json.loads(url.read().decode())
 
-with urllib.request.urlopen("https://json.medrating.org/todos") as url:
-    TODOS = json.loads(url.read().decode())
+    with urllib.request.urlopen("https://json.medrating.org/todos") as url:
+        TODOS = json.loads(url.read().decode())
+
+except ValueError:
+    print("Ошибка при загрузке файла JSON")
 
 
 def three_dots(string, length=50):
@@ -32,32 +36,37 @@ def todo_list(id_user):
     not_completed = ''
 
     for todo in TODOS:
-        if 'userId' in todo and id_user == todo.get('userId'):
-            if todo['completed']:
-                completed += three_dots(todo['title'])
-            else:
-                not_completed += three_dots(todo['title'])
+        try:
+            if id_user == todo.get('userId'):
+                if todo['completed']:
+                    completed += three_dots(todo['title'])
+                else:
+                    not_completed += three_dots(todo['title'])
+        except KeyError:
+            continue
     return completed, not_completed
 
 
 for user in USERS:
-    COMPLETED, NOT_COMPLETED = todo_list(user.get('id'))
-    if 'username' in user:
+    try:
+        COMPLETED, NOT_COMPLETED = todo_list(user.get('id'))
+
         PATH = f"tasks/{user['username']}.txt"
-    else:
+
+        if os.path.exists(PATH):
+            created_time = datetime.fromtimestamp(os.stat(PATH).st_ctime)
+            os.rename(PATH,
+                      f"{PATH[:-4]}_{created_time.strftime('%Y-%m-%dT%H:%M')}.txt")
+
+        with open(PATH, 'w', encoding='utf-8') as file:
+            file.write(
+                f"{user['name']} <{user['email']}> {datetime.today().strftime('%d.%m.%Y %H:%M')}\n"
+                f"{user['company']['name']}\n"
+                f"\n"
+                f"Завершенные задачи:\n"
+                f"{COMPLETED}\n"
+                f"Оставшиеся задачи:\n"
+                f"{NOT_COMPLETED}\n"
+            )
+    except KeyError:
         continue
-
-    if os.path.exists(PATH):
-        created_time = datetime.fromtimestamp(os.stat(PATH).st_ctime)
-        os.rename(PATH, f"{PATH[:-4]}_{created_time.strftime('%Y-%m-%dT%H:%M')}.txt")
-
-    with open(PATH, 'w', encoding='utf-8') as file:
-        file.write(
-            f"{user['name']} <{user['email']}> {datetime.today().strftime('%d.%m.%Y %H:%M')}\n"
-            f"{user['company']['name']}\n"
-            f"\n"
-            f"Завершенные задачи:\n"
-            f"{COMPLETED}\n"
-            f"Оставшиеся задачи:\n"
-            f"{NOT_COMPLETED}\n"
-        )
