@@ -49,7 +49,7 @@ for user in USERS:
 
     if os.path.exists(PATH):
         created_time = datetime.fromtimestamp(os.stat(PATH).st_ctime)
-        os.rename(PATH, f"{PATH[:-4]}_{created_time.strftime('%Y-%m-%dT%H_%M')}.txt")
+        os.rename(PATH, f"{PATH[:-4]}_{created_time.strftime('%Y-%m-%dT%H:%M')}.txt")
 
     with open(PATH, 'w', encoding='utf-8') as file:
         file.write(
