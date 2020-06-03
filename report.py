@@ -28,7 +28,7 @@ except URLError as err:
     print('We failed to reach a server.')
     print('Reason: ', err.reason)
 except ValueError:
-    print("Ошибка при загрузке файла JSON")
+    print("Error download JSON")
 
 
 def three_dots(string, length=50):
